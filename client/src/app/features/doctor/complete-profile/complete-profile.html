@@ -1,0 +1,45 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>Complete Your Doctor Profile</h2>
+    <p class="subtitle">Just a few more details before you start receiving appointments.</p>
+
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+      <div class="field">
+        <label for="specialty">Specialty</label>
+        <input pInputText id="specialty" formControlName="specialty" placeholder="e.g. Cardiology" />
+      </div>
+
+      <div class="field">
+        <label for="qualification">Qualification</label>
+        <input pInputText id="qualification" formControlName="qualification" placeholder="e.g. MBBS, MD" />
+      </div>
+
+      <div class="field">
+        <label for="experience">Years of Experience</label>
+        <p-inputnumber id="experience" formControlName="experience" [min]="0"></p-inputnumber>
+      </div>
+
+      <div class="field">
+        <label for="consultationFee">Consultation Fee (₹)</label>
+        <p-inputnumber id="consultationFee" formControlName="consultationFee" [min]="0"></p-inputnumber>
+      </div>
+
+      <div class="field">
+        <label for="bio">Short Bio</label>
+        <textarea pTextarea id="bio" formControlName="bio" rows="4" placeholder="Tell patients about yourself"></textarea>
+      </div>
+
+      @if (errorMessage) {
+        <p-message severity="error" [text]="errorMessage"></p-message>
+      }
+
+      <p-button
+        type="submit"
+        label="Save Profile"
+        [loading]="loading"
+        [disabled]="profileForm.invalid"
+        styleClass="w-full"
+      ></p-button>
+    </form>
+  </div>
+</div>

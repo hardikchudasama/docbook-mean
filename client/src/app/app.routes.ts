@@ -4,6 +4,7 @@ import { Register } from './features/auth/register/register';
 import { PatientDashboard } from './features/patient/patient-dashboard/patient-dashboard';
 import { DoctorDashboard } from './features/doctor/doctor-dashboard/doctor-dashboard';
 import { AdminDashboard } from './features/admin/admin-dashboard/admin-dashboard';
+import { CompleteProfile } from './features/doctor/complete-profile/complete-profile';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -12,4 +13,5 @@ export const routes: Routes = [
   { path: 'patient', component: PatientDashboard },
   { path: 'doctor', component: DoctorDashboard },
   { path: 'admin', component: AdminDashboard },
+  { path: 'doctor/complete-profile', component: CompleteProfile },
 ];

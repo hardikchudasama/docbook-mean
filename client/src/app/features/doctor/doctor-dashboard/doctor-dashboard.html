@@ -1,1 +1,9 @@
-<p>doctor-dashboard works!</p>
+@if (loading) {
+  <p>Loading...</p>
+} @else if (profile) {
+  <div class="dashboard-container">
+    <h1>Welcome, Dr. {{ profile.userId.name }}</h1>
+    <p>Specialty: {{ profile.specialty }}</p>
+    <p>Appointments dashboard coming soon.</p>
+  </div>
+}
