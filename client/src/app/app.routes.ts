@@ -14,4 +14,5 @@ export const routes: Routes = [
   { path: 'doctor', component: DoctorDashboard },
   { path: 'admin', component: AdminDashboard },
   { path: 'doctor/complete-profile', component: CompleteProfile },
+  // { path: 'patient/doctor/:id', component: DoctorProfileView }, // we'll create this next
 ];

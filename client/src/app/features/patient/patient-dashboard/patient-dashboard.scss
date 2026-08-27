@@ -1,0 +1,47 @@
+.dashboard-container {
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+
+  h1 {
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.doctor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.2rem;
+}
+
+.doctor-card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
+
+  h3 {
+    margin: 0 0 0.3rem;
+    color: #1e293b;
+  }
+
+  .specialty {
+    color: #3b82f6;
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+  }
+
+  .fee {
+    margin-top: 0.6rem;
+    font-weight: 600;
+    color: #16a34a;
+  }
+}

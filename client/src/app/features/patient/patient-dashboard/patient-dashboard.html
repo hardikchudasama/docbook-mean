@@ -1,4 +1,20 @@
 <div class="dashboard-container">
-  <h1>Welcome, Patient</h1>
-  <p>Doctor search and appointment booking will go here.</p>
+  <h1>Find a Doctor</h1>
+
+  @if (loading) {
+    <p>Loading doctors...</p>
+  } @else if (doctors.length === 0) {
+    <p>No doctors available yet.</p>
+  } @else {
+    <div class="doctor-grid">
+      @for (doc of doctors; track doc._id) {
+        <div class="doctor-card" (click)="viewDoctor(doc._id)">
+          <h3>Dr. {{ doc.userId.name }}</h3>
+          <p class="specialty">{{ doc.specialty }}</p>
+          <p>{{ doc.qualification }} • {{ doc.experience }} yrs exp</p>
+          <p class="fee">₹{{ doc.consultationFee }} consultation</p>
+        </div>
+      }
+    </div>
+  }
 </div>
