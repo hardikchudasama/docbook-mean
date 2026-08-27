@@ -1,0 +1,27 @@
+<div class="profile-container">
+  @if (loading) {
+    <p>Loading...</p>
+  } @else if (doctor) {
+    <div class="profile-card">
+      <button class="back-btn" (click)="goBack()">← Back to search</button>
+
+      <h1>Dr. {{ doctor.userId.name }}</h1>
+      <p class="specialty">{{ doctor.specialty }}</p>
+      <p class="qualification">{{ doctor.qualification }} • {{ doctor.experience }} years experience</p>
+
+      @if (doctor.bio) {
+        <p class="bio">{{ doctor.bio }}</p>
+      }
+
+      <div class="fee-box">
+        <span>Consultation Fee</span>
+        <strong>₹{{ doctor.consultationFee }}</strong>
+      </div>
+
+      <p-button label="Book Appointment" styleClass="w-full" [disabled]="true"></p-button>
+      <p class="coming-soon">Slot booking coming soon</p>
+    </div>
+  } @else {
+    <p>Doctor not found.</p>
+  }
+</div>
