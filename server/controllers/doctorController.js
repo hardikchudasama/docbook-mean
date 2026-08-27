@@ -1,5 +1,8 @@
 const Doctor = require("../models/Doctor");
 const User = require("../models/User");
+const { generateSlots } = require("../utils/slotGenerator");
+const Appointment = require("../models/Appointment"); // we'll create this in Step 3 below
+
 
 // Doctor completes their profile (after registering as role: doctor)
 exports.completeProfile = async (req, res) => {
@@ -108,6 +111,46 @@ exports.deleteDoctor = async (req, res) => {
   try {
     await Doctor.findByIdAndDelete(req.params.id);
     res.json({ message: "Doctor removed" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.getAvailableSlots = async (req, res) => {
+  try {
+    const { id } = req.params; // doctor id
+    const { date } = req.query; // e.g. "2026-09-01"
+
+    if (!date) {
+      return res.status(400).json({ message: "Date is required" });
+    }
+
+    const doctor = await Doctor.findById(id);
+    if (!doctor) {
+      return res.status(404).json({ message: "Doctor not found" });
+    }
+
+    // Check if doctor works on this day of week
+    const dayOfWeek = new Date(date).toLocaleDateString("en-US", { weekday: "short" }); // "Mon", "Tue", etc.
+    if (!doctor.workingDays.includes(dayOfWeek)) {
+      return res.json({ slots: [], message: "Doctor not available on this day" });
+    }
+
+    // Generate all possible slots for that day
+    const allSlots = generateSlots(doctor.workingHours, doctor.slotDuration);
+
+    // Find already-booked slots for this doctor on this date
+    const bookedAppointments = await Appointment.find({
+      doctorId: id,
+      date,
+      status: { $ne: "cancelled" }
+    });
+    const bookedSlots = bookedAppointments.map(appt => appt.timeSlot);
+
+    // Filter out booked slots
+    const availableSlots = allSlots.filter(slot => !bookedSlots.includes(slot));
+
+    res.json({ slots: availableSlots });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
