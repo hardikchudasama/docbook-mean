@@ -33,4 +33,8 @@ export class DoctorService {
   getDoctorById(id: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/${id}`);
   }
+
+  getAvailableSlots(doctorId: string, date: string): Observable<any> {
+  return this.http.get(`${this.apiUrl}/${doctorId}/slots`, { params: { date } });
+}
 }

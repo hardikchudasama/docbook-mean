@@ -18,8 +18,46 @@
         <strong>₹{{ doctor.consultationFee }}</strong>
       </div>
 
-      <p-button label="Book Appointment" styleClass="w-full" [disabled]="true"></p-button>
-      <p class="coming-soon">Slot booking coming soon</p>
+      <div class="booking-section">
+        <label>Select a date</label>
+        <p-datepicker
+          [(ngModel)]="selectedDate"
+          [minDate]="minDate"
+          (onSelect)="onDateSelect()"
+          dateFormat="dd M yy"
+          [readonlyInput]="true"
+          styleClass="w-full"
+        ></p-datepicker>
+
+        @if (slotsLoading) {
+          <p class="loading-text">Loading slots...</p>
+        }
+
+        @if (noSlotsMessage) {
+          <p class="no-slots">{{ noSlotsMessage }}</p>
+        }
+
+        @if (slots.length > 0) {
+          <div class="slot-grid">
+            @for (slot of slots; track slot) {
+              <button
+                class="slot-btn"
+                [class.selected]="selectedSlot === slot"
+                (click)="selectSlot(slot)"
+              >
+                {{ slot }}
+              </button>
+            }
+          </div>
+        }
+
+        <p-button
+          label="Book Appointment"
+          styleClass="w-full"
+          [disabled]="!selectedSlot"
+          (onClick)="bookAppointment()"
+        ></p-button>
+      </div>
     </div>
   } @else {
     <p>Doctor not found.</p>
