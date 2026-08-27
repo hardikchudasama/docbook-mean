@@ -14,6 +14,8 @@ const io = new Server(server, {
 app.use(cors({ origin: process.env.CLIENT_URL }));
 app.use(express.json());
 
+app.use("/api/auth", require("./routes/auth"));
+
 app.set("io", io);
 
 app.get("/api/health", (req, res) => res.json({ status: "Server is running" }));
