@@ -1,0 +1,68 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>Create Account</h2>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="field">
+        <label for="name">Full Name</label>
+        <input pInputText id="name" formControlName="name" placeholder="John Doe" />
+        @if (registerForm.get('name')?.invalid && registerForm.get('name')?.touched) {
+          <small class="error">Name is required</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input pInputText id="email" formControlName="email" placeholder="you@example.com" />
+        @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+          <small class="error">Valid email is required</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="phone">Phone</label>
+        <input pInputText id="phone" formControlName="phone" placeholder="9999999999" />
+        @if (registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched) {
+          <small class="error">Phone number is required</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <p-password id="password" formControlName="password" [feedback]="true" [toggleMask]="true"></p-password>
+        @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+          <small class="error">Password must be at least 6 characters</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="role">Register As</label>
+        <p-select
+          id="role"
+          formControlName="role"
+          [options]="roles"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select role"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+
+      @if (errorMessage) {
+        <p-message severity="error" [text]="errorMessage"></p-message>
+      }
+
+      <p-button
+        type="submit"
+        label="Register"
+        [loading]="loading"
+        [disabled]="registerForm.invalid"
+        styleClass="w-full"
+      ></p-button>
+    </form>
+
+    <p class="switch-link">
+      Already have an account? <a routerLink="/login">Login here</a>
+    </p>
+  </div>
+</div>
