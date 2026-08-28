@@ -1,65 +1,65 @@
 <div class="profile-container">
   @if (loading) {
-    <p>Loading...</p>
+  <p>Loading...</p>
   } @else if (doctor) {
-    <div class="profile-card">
-      <button class="back-btn" (click)="goBack()">← Back to search</button>
+  <div class="profile-card">
+    <button class="back-btn" (click)="goBack()">← Back to search</button>
 
-      <h1>Dr. {{ doctor.userId.name }}</h1>
-      <p class="specialty">{{ doctor.specialty }}</p>
-      <p class="qualification">{{ doctor.qualification }} • {{ doctor.experience }} years experience</p>
+    <h1>Dr. {{ doctor.userId.name }}</h1>
+    <p class="specialty">{{ doctor.specialty }}</p>
+    <p class="qualification">{{ doctor.qualification }} • {{ doctor.experience }} years experience</p>
 
-      @if (doctor.bio) {
-        <p class="bio">{{ doctor.bio }}</p>
+    @if (doctor.bio) {
+    <p class="bio">{{ doctor.bio }}</p>
+    }
+
+    <div class="fee-box">
+      <span>Consultation Fee</span>
+      <strong>₹{{ doctor.consultationFee }}</strong>
+    </div>
+
+    <div class="booking-section">
+      <label>Select a date</label>
+      <p-datepicker [(ngModel)]="selectedDate" [minDate]="minDate" (onSelect)="onDateSelect()" dateFormat="dd M yy"
+  [readonlyInput]="true" appendTo="body" styleClass="w-full"></p-datepicker>
+
+      @if (slotsLoading) {
+      <p class="loading-text">Loading slots...</p>
       }
 
-      <div class="fee-box">
-        <span>Consultation Fee</span>
-        <strong>₹{{ doctor.consultationFee }}</strong>
+      @if (noSlotsMessage) {
+      <p class="no-slots">{{ noSlotsMessage }}</p>
+      }
+
+      @if (slots.length > 0) {
+      <div class="slot-grid">
+        @for (slot of slots; track slot) {
+        <span
+  class="slot-btn"
+  [class.selected]="selectedSlot === slot"
+  (click)="selectSlot(slot)"
+  role="button"
+  tabindex="0"
+>
+  {{ slot }}
+</span>
+        }
       </div>
+      }
 
-      <div class="booking-section">
-        <label>Select a date</label>
-        <p-datepicker
-          [(ngModel)]="selectedDate"
-          [minDate]="minDate"
-          (onSelect)="onDateSelect()"
-          dateFormat="dd M yy"
-          [readonlyInput]="true"
-          styleClass="w-full"
-        ></p-datepicker>
+      @if (bookingError) {
+  <p-message severity="error" [text]="bookingError" styleClass="w-full booking-message"></p-message>
+}
 
-        @if (slotsLoading) {
-          <p class="loading-text">Loading slots...</p>
-        }
+@if (bookingSuccess) {
+  <p-message severity="success" text="Appointment booked successfully!" styleClass="w-full booking-message"></p-message>
+}
 
-        @if (noSlotsMessage) {
-          <p class="no-slots">{{ noSlotsMessage }}</p>
-        }
-
-        @if (slots.length > 0) {
-          <div class="slot-grid">
-            @for (slot of slots; track slot) {
-              <button
-                class="slot-btn"
-                [class.selected]="selectedSlot === slot"
-                (click)="selectSlot(slot)"
-              >
-                {{ slot }}
-              </button>
-            }
-          </div>
-        }
-
-        <p-button
-          label="Book Appointment"
-          styleClass="w-full"
-          [disabled]="!selectedSlot"
-          (onClick)="bookAppointment()"
-        ></p-button>
-      </div>
+      <p-button label="Book Appointment" styleClass="w-full" [disabled]="!selectedSlot"
+        (onClick)="bookAppointment()"></p-button>
     </div>
+  </div>
   } @else {
-    <p>Doctor not found.</p>
+  <p>Doctor not found.</p>
   }
 </div>

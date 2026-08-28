@@ -5,10 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DoctorService } from '../../../core/services/doctor-service';
+import { AppointmentService } from '../../../core/services/appointment.service';
+import { MessageModule } from 'primeng/message';
 
 @Component({
   selector: 'app-doctor-profile-view',
-  imports: [CommonModule, FormsModule, ButtonModule, DatePickerModule],
+  imports: [CommonModule, FormsModule, ButtonModule, DatePickerModule, MessageModule],
   templateUrl: './doctor-profile-view.html',
   styleUrl: './doctor-profile-view.scss'
 })
@@ -24,11 +26,16 @@ export class DoctorProfileView implements OnInit {
   selectedSlot: string | null = null;
   noSlotsMessage = '';
 
+  booking = false;
+  bookingError = '';
+  bookingSuccess = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private doctorService: DoctorService
-  ) {}
+    private doctorService: DoctorService,
+    private appointmentService: AppointmentService
+  ) { }
 
   ngOnInit() {
     this.doctorId = this.route.snapshot.paramMap.get('id') || '';
@@ -84,8 +91,37 @@ export class DoctorProfileView implements OnInit {
     this.router.navigate(['/patient']);
   }
 
+  // replace the bookAppointment method:
   bookAppointment() {
-    // We'll wire this to the real booking API in Day 8-10
-    console.log('Booking:', this.doctorId, this.formatDate(this.selectedDate!), this.selectedSlot);
+    if (!this.selectedDate || !this.selectedSlot) return;
+
+    this.booking = true;
+    this.bookingError = '';
+
+    const payload = {
+      doctorId: this.doctorId,
+      date: this.formatDate(this.selectedDate),
+      timeSlot: this.selectedSlot,
+      reason: 'General consultation'
+    };
+
+    this.appointmentService.bookAppointment(payload).subscribe({
+      next: () => {
+        this.booking = false;
+        this.bookingSuccess = true;
+        // Refresh slots so the just-booked slot disappears
+        this.onDateSelect();
+        this.selectedSlot = null;
+      },
+      error: (err) => {
+        this.booking = false;
+        this.bookingError = err.error?.message || 'Booking failed. Please try again.';
+        if (err.status === 409) {
+          // Slot was taken by someone else — refresh to show current availability
+          this.onDateSelect();
+          this.selectedSlot = null;
+        }
+      }
+    });
   }
 }
