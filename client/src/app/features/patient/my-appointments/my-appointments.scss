@@ -1,0 +1,98 @@
+.dashboard-container {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+
+  h1 {
+    color: #1e293b;
+    margin-bottom: 1.2rem;
+  }
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+
+  .tab {
+    padding: 0.5rem 1rem;
+    border: 1px solid #cbd5e1;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #475569;
+
+    &.active {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+    }
+  }
+}
+
+.empty-state {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  text-align: center;
+  color: #64748b;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.appointment-card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.2rem 1.5rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.appt-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.appt-info {
+  h3 {
+    margin: 0 0 0.2rem;
+    color: #1e293b;
+  }
+
+  .appt-specialty {
+    color: #3b82f6;
+    font-size: 0.85rem;
+    margin: 0 0 0.3rem;
+  }
+
+  .appt-date {
+    color: #334155;
+    font-weight: 500;
+    margin: 0 0 0.3rem;
+  }
+
+  .appt-reason {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .cancel-reason {
+    color: #ef4444;
+    font-size: 0.85rem;
+    margin: 0.3rem 0 0;
+  }
+}
+
+.appt-actions {
+  display: flex;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f1f5f9;
+}
