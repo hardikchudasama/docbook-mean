@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const Appointment = require("../models/Appointment");
+const { sendBookingConfirmation, sendCancellationEmail } = require("../services/emailService");
 const Doctor = require("../models/Doctor");
+const User = require("../models/User");
 
 exports.bookAppointment = async (req, res) => {
   const { doctorId, date, timeSlot, reason, socketId } = req.body;
@@ -32,6 +34,24 @@ exports.bookAppointment = async (req, res) => {
     // Real-time: notify anyone viewing this doctor's slots for this date
     const io = req.app.get("io");
     io.emit("slotBooked", { doctorId, date, timeSlot, emittedBy: socketId });
+
+    // Send confirmation email — non-blocking, don't await
+    (async () => {
+      try {
+        const patient = await User.findById(patientId);
+        const doctor = await Doctor.findById(doctorId).populate("userId", "name");
+        await sendBookingConfirmation(patient.email, {
+          patientName: patient.name,
+          doctorName: doctor.userId.name,
+          specialty: doctor.specialty,
+          date,
+          timeSlot,
+          fee: doctor.consultationFee
+        });
+      } catch (emailErr) {
+        console.error("Failed to send booking email:", emailErr.message);
+      }
+    })();
 
     res.status(201).json(appointment[0]);
   } catch (err) {
@@ -158,6 +178,23 @@ exports.cancelAppointment = async (req, res) => {
 
     const io = req.app.get("io");
     io.emit("slotCancelled", { doctorId: appointment.doctorId, date: appointment.date, timeSlot: appointment.timeSlot });
+
+    // Send cancellation email — non-blocking
+    (async () => {
+      try {
+        const patient = await User.findById(appointment.patientId);
+        const doctor = await Doctor.findById(appointment.doctorId).populate("userId", "name");
+        await sendCancellationEmail(patient.email, {
+          patientName: patient.name,
+          doctorName: doctor.userId.name,
+          date: appointment.date,
+          timeSlot: appointment.timeSlot,
+          reason: appointment.cancelReason
+        });
+      } catch (emailErr) {
+        console.error("Failed to send cancellation email:", emailErr.message);
+      }
+    })();
 
     res.json({ message: "Appointment cancelled", appointment });
   } catch (err) {

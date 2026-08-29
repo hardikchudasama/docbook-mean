@@ -1,0 +1,40 @@
+<div class="app-shell">
+  <nav class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-left">
+        <a [routerLink]="dashboardLink" class="logo">DocBook</a>
+
+        @if (user) {
+        <div class="nav-links">
+          @if (user.role === 'patient') {
+          <a routerLink="/patient" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}"
+            class="nav-link">Find Doctors</a>
+          <a routerLink="/patient/appointments" routerLinkActive="active-link" class="nav-link">My Appointments</a>
+          }
+          @if (user.role === 'doctor') {
+          <a routerLink="/doctor" routerLinkActive="active-link" class="nav-link">Dashboard</a>
+          }
+          @if (user.role === 'admin') {
+          <a routerLink="/admin" routerLinkActive="active-link" class="nav-link">Dashboard</a>
+          }
+        </div>
+        }
+      </div>
+
+      @if (user) {
+      <div class="navbar-right">
+        <div class="user-info">
+          <span class="user-name">{{ user.name }}</span>
+          <span class="user-role">{{ user.role }}</span>
+        </div>
+
+        <p-button label="Logout" size="small" [outlined]="true" styleClass="logout-btn" (onClick)="logout()"></p-button>
+      </div>
+      }
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
