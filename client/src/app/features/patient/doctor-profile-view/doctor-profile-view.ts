@@ -7,6 +7,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { DoctorService } from '../../../core/services/doctor-service';
 import { AppointmentService } from '../../../core/services/appointment.service';
 import { MessageModule } from 'primeng/message';
+import { SocketService } from '../../../core/services/socket.service';
 
 @Component({
   selector: 'app-doctor-profile-view',
@@ -34,7 +35,8 @@ export class DoctorProfileView implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private doctorService: DoctorService,
-    private appointmentService: AppointmentService
+    private appointmentService: AppointmentService,
+    private socketService: SocketService
   ) { }
 
   ngOnInit() {
@@ -50,6 +52,28 @@ export class DoctorProfileView implements OnInit {
         }
       });
     }
+
+    // Listen for real-time slot updates
+    this.socketService.onSlotBooked((data) => {
+    // Skip if this event was triggered by my own booking
+    if (data.emittedBy === this.socketService.getSocketId()) return;
+
+    if (data.doctorId === this.doctorId && this.selectedDate && this.formatDate(this.selectedDate) === data.date) {
+      this.slots = this.slots.filter(s => s !== data.timeSlot);
+      if (this.selectedSlot === data.timeSlot) {
+        this.selectedSlot = null;
+        this.bookingError = 'This slot was just booked by someone else. Please choose another.';
+      }
+    }
+  });
+
+    this.socketService.onSlotCancelled((data) => {
+      if (data.doctorId === this.doctorId && this.selectedDate && this.formatDate(this.selectedDate) === data.date) {
+        if (!this.slots.includes(data.timeSlot)) {
+          this.slots = [...this.slots, data.timeSlot].sort();
+        }
+      }
+    });
   }
 
   onDateSelect() {
@@ -93,35 +117,34 @@ export class DoctorProfileView implements OnInit {
 
   // replace the bookAppointment method:
   bookAppointment() {
-    if (!this.selectedDate || !this.selectedSlot) return;
+  if (!this.selectedDate || !this.selectedSlot) return;
 
-    this.booking = true;
-    this.bookingError = '';
+  this.booking = true;
+  this.bookingError = '';
 
-    const payload = {
-      doctorId: this.doctorId,
-      date: this.formatDate(this.selectedDate),
-      timeSlot: this.selectedSlot,
-      reason: 'General consultation'
-    };
+  const payload = {
+    doctorId: this.doctorId,
+    date: this.formatDate(this.selectedDate),
+    timeSlot: this.selectedSlot,
+    reason: 'General consultation',
+    socketId: this.socketService.getSocketId()  // add this
+  };
 
-    this.appointmentService.bookAppointment(payload).subscribe({
-      next: () => {
-        this.booking = false;
-        this.bookingSuccess = true;
-        // Refresh slots so the just-booked slot disappears
+  this.appointmentService.bookAppointment(payload).subscribe({
+    next: () => {
+      this.booking = false;
+      this.bookingSuccess = true;
+      this.onDateSelect();
+      this.selectedSlot = null;
+    },
+    error: (err) => {
+      this.booking = false;
+      this.bookingError = err.error?.message || 'Booking failed. Please try again.';
+      if (err.status === 409) {
         this.onDateSelect();
         this.selectedSlot = null;
-      },
-      error: (err) => {
-        this.booking = false;
-        this.bookingError = err.error?.message || 'Booking failed. Please try again.';
-        if (err.status === 409) {
-          // Slot was taken by someone else — refresh to show current availability
-          this.onDateSelect();
-          this.selectedSlot = null;
-        }
       }
-    });
-  }
+    }
+  });
+}
 }

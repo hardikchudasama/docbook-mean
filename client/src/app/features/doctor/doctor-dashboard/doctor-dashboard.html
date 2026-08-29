@@ -1,9 +1,70 @@
 @if (loading) {
-  <p>Loading...</p>
+  <p class="loading-page">Loading...</p>
 } @else if (profile) {
   <div class="dashboard-container">
-    <h1>Welcome, Dr. {{ profile.userId.name }}</h1>
-    <p>Specialty: {{ profile.specialty }}</p>
-    <p>Appointments dashboard coming soon.</p>
+    <div class="dashboard-header">
+      <div>
+        <h1>Welcome, Dr. {{ profile.userId.name }}</h1>
+        <p class="specialty-tag">{{ profile.specialty }}</p>
+      </div>
+    </div>
+
+    <h2>Your Appointments</h2>
+
+    @if (appointmentsLoading) {
+      <p>Loading appointments...</p>
+    } @else if (appointments.length === 0) {
+      <div class="empty-state">
+        <p>No appointments yet.</p>
+      </div>
+    } @else {
+      <div class="appointments-list">
+        @for (appt of appointments; track appt._id) {
+          <div class="appointment-card">
+            <div class="appt-main">
+              <div class="appt-info">
+                <h3>{{ appt.patientId.name }}</h3>
+                <p class="appt-date">{{ appt.date }} at {{ appt.timeSlot }}</p>
+                @if (appt.reason) {
+                  <p class="appt-reason">{{ appt.reason }}</p>
+                }
+                @if (appt.status === 'cancelled' && appt.cancelReason) {
+                  <p class="cancel-reason">Cancelled: {{ appt.cancelReason }}</p>
+                }
+              </div>
+              <p-tag [value]="appt.status" [severity]="getSeverity(appt.status)"></p-tag>
+            </div>
+
+            @if (isUpcoming(appt)) {
+              <div class="appt-actions">
+                <p-button
+                  label="Mark Completed"
+                  size="small"
+                  severity="success"
+                  [loading]="actionLoadingId === appt._id"
+                  (onClick)="markStatus(appt._id, 'completed')"
+                ></p-button>
+                <p-button
+                  label="No-show"
+                  size="small"
+                  severity="warn"
+                  [outlined]="true"
+                  [loading]="actionLoadingId === appt._id"
+                  (onClick)="markStatus(appt._id, 'no-show')"
+                ></p-button>
+                <p-button
+                  label="Cancel"
+                  size="small"
+                  severity="danger"
+                  [outlined]="true"
+                  [loading]="actionLoadingId === appt._id"
+                  (onClick)="cancelAppointment(appt._id)"
+                ></p-button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
   </div>
 }

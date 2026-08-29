@@ -1,0 +1,92 @@
+.loading-page {
+  padding: 2rem;
+  text-align: center;
+}
+
+.dashboard-container {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+
+  h1 {
+    margin: 0 0 0.3rem;
+    color: #1e293b;
+  }
+
+  .specialty-tag {
+    color: #3b82f6;
+    font-weight: 500;
+    margin: 0;
+  }
+}
+
+h2 {
+  color: #334155;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.empty-state {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  text-align: center;
+  color: #64748b;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.appointment-card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.2rem 1.5rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.appt-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.appt-info {
+  h3 {
+    margin: 0 0 0.3rem;
+    color: #1e293b;
+  }
+
+  .appt-date {
+    color: #3b82f6;
+    font-weight: 500;
+    margin: 0 0 0.3rem;
+  }
+
+  .appt-reason {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .cancel-reason {
+    color: #ef4444;
+    font-size: 0.85rem;
+    margin: 0.3rem 0 0;
+  }
+}
+
+.appt-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f1f5f9;
+}

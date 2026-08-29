@@ -3,7 +3,7 @@ const Appointment = require("../models/Appointment");
 const Doctor = require("../models/Doctor");
 
 exports.bookAppointment = async (req, res) => {
-  const { doctorId, date, timeSlot, reason } = req.body;
+  const { doctorId, date, timeSlot, reason, socketId } = req.body;
   const patientId = req.user.id; // from JWT via protect middleware
 
   const session = await mongoose.startSession();
@@ -31,7 +31,7 @@ exports.bookAppointment = async (req, res) => {
 
     // Real-time: notify anyone viewing this doctor's slots for this date
     const io = req.app.get("io");
-    io.emit("slotBooked", { doctorId, date, timeSlot });
+    io.emit("slotBooked", { doctorId, date, timeSlot, emittedBy: socketId });
 
     res.status(201).json(appointment[0]);
   } catch (err) {
@@ -79,6 +79,87 @@ exports.getMyAppointments = async (req, res) => {
       .sort({ date: -1 });
 
     res.json(appointments);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Get all appointments for the logged-in doctor
+exports.getDoctorAppointments = async (req, res) => {
+  try {
+    const doctorProfile = await Doctor.findOne({ userId: req.user.id });
+    if (!doctorProfile) {
+      return res.status(404).json({ message: "Doctor profile not found" });
+    }
+
+    const appointments = await Appointment.find({ doctorId: doctorProfile._id })
+      .populate("patientId", "name email phone")
+      .sort({ date: 1, timeSlot: 1 });
+
+    res.json(appointments);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Doctor updates appointment status (completed / no-show)
+exports.updateAppointmentStatus = async (req, res) => {
+  try {
+    const { status } = req.body; // "completed" or "no-show"
+
+    if (!["completed", "no-show"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    const appointment = await Appointment.findById(req.params.id);
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    const doctorProfile = await Doctor.findOne({ userId: req.user.id });
+    if (!doctorProfile || appointment.doctorId.toString() !== doctorProfile._id.toString()) {
+      return res.status(403).json({ message: "Not authorized to update this appointment" });
+    }
+
+    appointment.status = status;
+    await appointment.save();
+
+    res.json({ message: "Status updated", appointment });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.cancelAppointment = async (req, res) => {
+  try {
+    const { reason } = req.body;
+    const appointment = await Appointment.findById(req.params.id);
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    const isPatientOwner = appointment.patientId.toString() === req.user.id;
+    const isAdmin = req.user.role === "admin";
+
+    let isDoctorOwner = false;
+    if (req.user.role === "doctor") {
+      const doctorProfile = await Doctor.findOne({ userId: req.user.id });
+      isDoctorOwner = doctorProfile && appointment.doctorId.toString() === doctorProfile._id.toString();
+    }
+
+    if (!isPatientOwner && !isAdmin && !isDoctorOwner) {
+      return res.status(403).json({ message: "Not authorized to cancel this appointment" });
+    }
+
+    appointment.status = "cancelled";
+    if (reason) appointment.cancelReason = reason;
+    await appointment.save();
+
+    const io = req.app.get("io");
+    io.emit("slotCancelled", { doctorId: appointment.doctorId, date: appointment.date, timeSlot: appointment.timeSlot });
+
+    res.json({ message: "Appointment cancelled", appointment });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

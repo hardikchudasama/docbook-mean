@@ -7,17 +7,24 @@ import { environment } from '../../../environments/environment';
 export class AppointmentService {
   private apiUrl = `${environment.apiUrl}/appointments`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   bookAppointment(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}`, data);
   }
 
-  cancelAppointment(id: string): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/${id}/cancel`, {});
+  cancelAppointment(id: string, reason?: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}/cancel`, { reason });
   }
-
   getMyAppointments(): Observable<any> {
     return this.http.get(`${this.apiUrl}/my`);
+  }
+
+  getDoctorAppointments(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/doctor/my`);
+  }
+
+  updateAppointmentStatus(id: string, status: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}/status`, { status });
   }
 }

@@ -7,6 +7,7 @@ const appointmentSchema = new mongoose.Schema({
   timeSlot: { type: String, required: true }, // "10:00"
   status: { type: String, enum: ["confirmed", "cancelled", "completed", "no-show"], default: "confirmed" },
   reason: { type: String },
+  cancelReason: { type: String },
 }, { timestamps: true });
 
 // Prevent double-booking at the database level too (extra safety net)
