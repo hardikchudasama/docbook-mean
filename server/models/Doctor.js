@@ -13,6 +13,7 @@ const doctorSchema = new mongoose.Schema({
     end: { type: String, default: "17:00" }
   },
   slotDuration: { type: Number, default: 30 }, // minutes
+  isActive: { type: Boolean, default: true },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Doctor", doctorSchema);

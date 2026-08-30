@@ -23,6 +23,7 @@ export const routes: Routes = [
       { path: 'patient/doctor/:id', component: DoctorProfileView },
       { path: 'patient/appointments', component: MyAppointments },
       { path: 'doctor', component: DoctorDashboard },
+      { path: 'admin', component: AdminDashboard },
     ]
   }
 ];

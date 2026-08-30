@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { type: String, enum: ["patient", "doctor", "admin"], default: "patient" },
   phone: { type: String },
+  isActive: { type: Boolean, default: true }, // For soft delete
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);

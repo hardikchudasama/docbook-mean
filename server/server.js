@@ -17,6 +17,7 @@ app.use(express.json());
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/doctors", require("./routes/doctor"));
 app.use("/api/appointments", require("./routes/appointment"));
+app.use("/api/admin", require("./routes/admin"));
 
 app.set("io", io);
 

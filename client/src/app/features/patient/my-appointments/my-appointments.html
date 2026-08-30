@@ -1,61 +1,49 @@
 <div class="dashboard-container">
   <div class="filter-tabs">
-    <button
-      class="tab"
-      [class.active]="filter === 'upcoming'"
-      (click)="setFilter('upcoming')"
-    >Upcoming</button>
-    <button
-      class="tab"
-      [class.active]="filter === 'past'"
-      (click)="setFilter('past')"
-    >Past / Cancelled</button>
-    <button
-      class="tab"
-      [class.active]="filter === 'all'"
-      (click)="setFilter('all')"
-    >All</button>
+    <button class="tab" [class.active]="filter === 'upcoming'" (click)="setFilter('upcoming')">Upcoming</button>
+    <button class="tab" [class.active]="filter === 'past'" (click)="setFilter('past')">Past / Cancelled</button>
+    <button class="tab" [class.active]="filter === 'all'" (click)="setFilter('all')">All</button>
   </div>
 
   @if (loading) {
-    <p>Loading appointments...</p>
+  <p>Loading appointments...</p>
   } @else if (filteredAppointments.length === 0) {
-    <div class="empty-state">
-      <p>No appointments found.</p>
-    </div>
+  <div class="empty-state">
+    <p>No appointments found.</p>
+  </div>
   } @else {
-    <div class="appointments-list">
-      @for (appt of filteredAppointments; track appt._id) {
-        <div class="appointment-card">
-          <div class="appt-main">
-            <div class="appt-info">
-              <h3>Dr. {{ appt.doctorId.userId.name }}</h3>
-              <p class="appt-specialty">{{ appt.doctorId.specialty }}</p>
-              <p class="appt-date">{{ appt.date }} at {{ appt.timeSlot }}</p>
-              @if (appt.reason) {
-                <p class="appt-reason">{{ appt.reason }}</p>
-              }
-              @if (appt.status === 'cancelled' && appt.cancelReason) {
-                <p class="cancel-reason">Reason: {{ appt.cancelReason }}</p>
-              }
-            </div>
-            <p-tag [value]="appt.status" [severity]="getSeverity(appt.status)"></p-tag>
-          </div>
-
-          @if (canCancel(appt)) {
-            <div class="appt-actions">
-              <p-button
-                label="Cancel Appointment"
-                size="small"
-                severity="danger"
-                [outlined]="true"
-                [loading]="actionLoadingId === appt._id"
-                (onClick)="cancelAppointment(appt._id)"
-              ></p-button>
-            </div>
+  <div class="appointments-list">
+    @for (appt of filteredAppointments; track appt._id) {
+    @if (appt.doctorId) {
+    <div class="appointment-card">
+      <div class="appt-main">
+        <div class="appt-info">
+          <h3>Dr. {{ appt.doctorId.userId?.name || 'Unknown' }}</h3>
+          <p class="appt-specialty">{{ appt.doctorId.specialty }}</p>
+          <p class="appt-date">{{ appt.date }} at {{ appt.timeSlot }}</p>
+          @if (appt.reason) {
+          <p class="appt-reason">{{ appt.reason }}</p>
+          }
+          @if (appt.status === 'cancelled' && appt.cancelReason) {
+          <p class="cancel-reason">Reason: {{ appt.cancelReason }}</p>
           }
         </div>
+        <p-tag [value]="appt.status" [severity]="getSeverity(appt.status)"></p-tag>
+      </div>
+
+      @if (canCancel(appt)) {
+      <div class="appt-actions">
+        <p-button label="Cancel Appointment" size="small" severity="danger" [outlined]="true"
+          [loading]="actionLoadingId === appt._id" (onClick)="cancelAppointment(appt._id)"></p-button>
+      </div>
       }
     </div>
+    } @else {
+    <div class="appointment-card">
+      <p class="appt-error">This appointment's doctor is no longer available.</p>
+    </div>
+    }
+    }
+  </div>
   }
 </div>

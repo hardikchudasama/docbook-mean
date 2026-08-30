@@ -1,1 +1,172 @@
-<p>admin-dashboard works!</p>
+<div class="dashboard-container">
+    <h1>Admin Dashboard</h1>
+
+    <!-- Stats Cards -->
+    @if (!statsLoading && stats) {
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-value">{{ stats.totalDoctors }}</span>
+            <span class="stat-label">Doctors</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value">{{ stats.totalPatients }}</span>
+            <span class="stat-label">Patients</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value">{{ stats.totalAppointments }}</span>
+            <span class="stat-label">Total Appointments</span>
+        </div>
+        <div class="stat-card success">
+            <span class="stat-value">{{ stats.completedAppointments }}</span>
+            <span class="stat-label">Completed</span>
+        </div>
+        <div class="stat-card danger">
+            <span class="stat-value">{{ stats.cancelledAppointments }}</span>
+            <span class="stat-label">Cancelled</span>
+        </div>
+    </div>
+    }
+
+    <!-- Toolbar: Tabs (left) + Search/Filter (right) -->
+    <div class="toolbar-row">
+        <div class="tabs">
+            <button class="tab" [class.active]="activeTab === 'doctors'" (click)="setTab('doctors')">Doctors</button>
+            <button class="tab" [class.active]="activeTab === 'users'" (click)="setTab('users')">Users</button>
+            <button class="tab" [class.active]="activeTab === 'appointments'" (click)="setTab('appointments')">All
+                Appointments</button>
+        </div>
+
+        <div class="toolbar-filters">
+            @if (activeTab === 'doctors') {
+            <input pInputText type="text" placeholder="Search by name or specialty..."
+                (input)="onGlobalFilter($event, doctorTable)" class="search-box" />
+            }
+
+            @if (activeTab === 'users') {
+            <input pInputText type="text" placeholder="Search by name or email..."
+                (input)="onGlobalFilter($event, userTable)" class="search-box" />
+            <select class="status-filter" (change)="onRoleFilter($event, userTable)">
+                <option value="">All Roles</option>
+                <option value="patient">Patient</option>
+                <option value="doctor">Doctor</option>
+                <option value="admin">Admin</option>
+            </select>
+            }
+
+            @if (activeTab === 'appointments') {
+            <input pInputText type="text" placeholder="Search by patient or doctor..."
+                (input)="onGlobalFilter($event, apptTable)" class="search-box" />
+            <select class="status-filter" (change)="onStatusFilter($event, apptTable)">
+                <option value="">All Statuses</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="no-show">No-show</option>
+            </select>
+            }
+        </div>
+    </div>
+
+    <!-- Doctors Table -->
+    @if (activeTab === 'doctors') {
+    <p-table #doctorTable [value]="doctors" [loading]="tableLoading" [paginator]="true" [rows]="10" sortMode="single"
+        [stripedRows]="true" [globalFilterFields]="['userId.name', 'specialty']">
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="userId.name">Name <p-sortIcon field="userId.name"></p-sortIcon></th>
+                <th pSortableColumn="specialty">Specialty <p-sortIcon field="specialty"></p-sortIcon></th>
+                <th pSortableColumn="experience">Experience <p-sortIcon field="experience"></p-sortIcon></th>
+                <th pSortableColumn="consultationFee">Fee <p-sortIcon field="consultationFee"></p-sortIcon></th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-doc>
+            <tr>
+                <td>Dr. {{ doc.userId.name }}</td>
+                <td>{{ doc.specialty }}</td>
+                <td>{{ doc.experience }} yrs</td>
+                <td>₹{{ doc.consultationFee }}</td>
+                <td>
+                    <p-button label="Remove" size="small" severity="danger" [outlined]="true"
+                        [loading]="actionLoadingId === doc._id" (onClick)="deleteDoctor(doc._id)"></p-button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="5" class="empty-cell">No doctors found.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+    }
+
+    <!-- Users Table -->
+    @if (activeTab === 'users') {
+    <p-table #userTable [value]="users" [loading]="tableLoading" [paginator]="true" [rows]="10" sortMode="single"
+        [stripedRows]="true" [globalFilterFields]="['name', 'email']">
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
+                <th pSortableColumn="email">Email <p-sortIcon field="email"></p-sortIcon></th>
+                <th pSortableColumn="role">Role <p-sortIcon field="role"></p-sortIcon></th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-user>
+            <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td class="capitalize">{{ user.role }}</td>
+                <td>
+                    <p-tag [value]="user.isActive ? 'Active' : 'Inactive'"
+                        [severity]="user.isActive ? 'success' : 'danger'"></p-tag>
+                </td>
+                <td>
+                    <p-button [label]="user.isActive ? 'Deactivate' : 'Activate'" size="small"
+                        [severity]="user.isActive ? 'danger' : 'success'" [outlined]="true"
+                        [loading]="actionLoadingId === user._id" (onClick)="toggleUserStatus(user._id)"></p-button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="5" class="empty-cell">No users found.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+    }
+
+    <!-- Appointments Table -->
+    @if (activeTab === 'appointments') {
+    <p-table #apptTable [value]="appointments" [loading]="tableLoading" [paginator]="true" [rows]="10" sortMode="single"
+        [stripedRows]="true" [globalFilterFields]="['patientId.name', 'doctorId.userId.name']">
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="patientId.name">Patient <p-sortIcon field="patientId.name"></p-sortIcon></th>
+                <th pSortableColumn="doctorId.userId.name">Doctor <p-sortIcon field="doctorId.userId.name"></p-sortIcon>
+                </th>
+                <th pSortableColumn="date">Date <p-sortIcon field="date"></p-sortIcon></th>
+                <th pSortableColumn="timeSlot">Time <p-sortIcon field="timeSlot"></p-sortIcon></th>
+                <th pSortableColumn="status">Status <p-sortIcon field="status"></p-sortIcon></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-appt>
+            <tr>
+                <td>{{ appt.patientId.name }}</td>
+                <td>Dr. {{ appt.doctorId.userId.name }}</td>
+                <td>{{ appt.date }}</td>
+                <td>{{ appt.timeSlot }}</td>
+                <td>
+                    <p-tag [value]="appt.status" [severity]="getSeverity(appt.status)"></p-tag>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="5" class="empty-cell">No appointments found.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+    }
+</div>

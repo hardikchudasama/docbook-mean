@@ -64,7 +64,7 @@ exports.updateMyProfile = async (req, res) => {
 exports.getAllDoctors = async (req, res) => {
   try {
     const { specialty, search } = req.query;
-    let filter = {};
+    let filter = { isActive: true }; // add this
 
     if (specialty) filter.specialty = specialty;
 
@@ -109,8 +109,12 @@ exports.adminGetAllDoctors = async (req, res) => {
 // Admin: Delete/deactivate a doctor
 exports.deleteDoctor = async (req, res) => {
   try {
-    await Doctor.findByIdAndDelete(req.params.id);
-    res.json({ message: "Doctor removed" });
+    const doctor = await Doctor.findByIdAndUpdate(
+      req.params.id,
+      { isActive: false },
+      { new: true }
+    );
+    res.json({ message: "Doctor deactivated", doctor });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
