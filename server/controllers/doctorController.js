@@ -64,7 +64,7 @@ exports.updateMyProfile = async (req, res) => {
 exports.getAllDoctors = async (req, res) => {
   try {
     const { specialty, search } = req.query;
-    let filter = { isActive: true }; // add this
+    let filter = { isActive: { $ne: false } };
 
     if (specialty) filter.specialty = specialty;
 
@@ -99,7 +99,7 @@ exports.getDoctorById = async (req, res) => {
 // Admin: Get all doctors with full details (for admin management table)
 exports.adminGetAllDoctors = async (req, res) => {
   try {
-    const doctors = await Doctor.find().populate("userId", "name email phone");
+    const doctors = await Doctor.find({ isActive: { $ne: false } }).populate("userId", "name email phone");
     res.json(doctors);
   } catch (err) {
     res.status(500).json({ message: err.message });
