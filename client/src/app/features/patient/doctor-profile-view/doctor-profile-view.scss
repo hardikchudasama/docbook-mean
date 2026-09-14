@@ -76,6 +76,12 @@
     font-size: 0.9rem;
     margin: 1rem 0;
   }
+
+  // Add this — guarantees consistent spacing above the button in every state
+  p-button {
+    display: block;
+    margin-top: 1.5rem;
+  }
 }
 
 .slot-btn {
@@ -97,4 +103,12 @@
     color: white;
     border-color: #3b82f6;
   }
+}
+
+
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 0.6rem;
+  margin: 1rem 0 2rem; // increased from 1.5rem to 2rem
 }
