@@ -139,6 +139,7 @@
 
     <!-- Appointments Table -->
     @if (activeTab === 'appointments') {
+        
     <p-table #apptTable [value]="appointments" [loading]="tableLoading" [paginator]="true" [rows]="10" sortMode="single"
         [stripedRows]="true" [globalFilterFields]="['patientId.name', 'doctorId.userId.name']">
         <ng-template pTemplate="header">
