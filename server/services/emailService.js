@@ -1,21 +1,11 @@
-const nodemailer = require("nodemailer");
-
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // STARTTLS, not direct SSL
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  family: 4,
-});
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendBookingConfirmation = async (toEmail, details) => {
   const { patientName, doctorName, date, timeSlot, specialty, fee } = details;
 
-  const mailOptions = {
-    from: `"DocBook" <${process.env.EMAIL_USER}>`,
+  await resend.emails.send({
+    from: "DocBook <onboarding@resend.dev>", // Resend's free testing domain — works out of the box
     to: toEmail,
     subject: "Appointment Confirmed - DocBook",
     html: `
@@ -34,16 +24,14 @@ const sendBookingConfirmation = async (toEmail, details) => {
         <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 2rem;">— The DocBook Team</p>
       </div>
     `,
-  };
-
-  await transporter.sendMail(mailOptions);
+  });
 };
 
 const sendCancellationEmail = async (toEmail, details) => {
   const { patientName, doctorName, date, timeSlot, reason } = details;
 
-  const mailOptions = {
-    from: `"DocBook" <${process.env.EMAIL_USER}>`,
+  await resend.emails.send({
+    from: "DocBook <onboarding@resend.dev>",
     to: toEmail,
     subject: "Appointment Cancelled - DocBook",
     html: `
@@ -56,9 +44,7 @@ const sendCancellationEmail = async (toEmail, details) => {
         <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 2rem;">— The DocBook Team</p>
       </div>
     `,
-  };
-
-  await transporter.sendMail(mailOptions);
+  });
 };
 
 module.exports = { sendBookingConfirmation, sendCancellationEmail };
