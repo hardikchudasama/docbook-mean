@@ -2,7 +2,7 @@
 
 A full-stack MEAN application for booking doctor appointments, built with a focus on **conflict-free scheduling** and **real-time availability updates** across multiple concurrent users.
 
-🔗 **Live Demo:** [docbook-mean.vercel.app](https://docbook-mean-hy6k7ayuv-hardiks-projects-741747a9.vercel.app)
+🔗 **Live Demo:** [docbook-mean.vercel.app](https://docbook-mean.vercel.app)
 🔗 **Backend API:** [docbook-backend-gmer.onrender.com](https://docbook-backend-gmer.onrender.com)
 
 > **Note:** the backend is hosted on Render's free tier, which spins down after inactivity. The first request after idle time may take 30–50 seconds to respond while the server wakes up.
