@@ -1,34 +1,54 @@
 <div class="app-shell">
   <nav class="navbar">
     <div class="navbar-content">
-      <div class="navbar-left">
-        <a [routerLink]="dashboardLink" class="logo">DocBook</a>
+      <div class="navbar-top">
+        <div class="navbar-left">
+          <a [routerLink]="dashboardLink" class="logo">DocBook</a>
+        </div>
 
         @if (user) {
-        <div class="nav-links">
-          @if (user.role === 'patient') {
-          <a routerLink="/patient" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}"
-            class="nav-link">Find Doctors</a>
-          <a routerLink="/patient/appointments" routerLinkActive="active-link" class="nav-link">My Appointments</a>
-          }
-          @if (user.role === 'doctor') {
-          <a routerLink="/doctor" routerLinkActive="active-link" class="nav-link">Dashboard</a>
-          }
-          @if (user.role === 'admin') {
-          <a routerLink="/admin" routerLinkActive="active-link" class="nav-link">Dashboard</a>
-          }
-        </div>
+        <button
+          type="button"
+          class="menu-toggle"
+          [attr.aria-expanded]="mobileMenuOpen"
+          aria-controls="primary-navigation"
+          [attr.aria-label]="mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'"
+          (click)="toggleMobileMenu()">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
         }
       </div>
 
       @if (user) {
-      <div class="navbar-right">
-        <div class="user-info">
-          <span class="user-name">{{ user.name }}</span>
-          <span class="user-role">{{ user.role }}</span>
+      <div id="primary-navigation" class="navbar-menu" [class.is-open]="mobileMenuOpen">
+        <div class="nav-links">
+          @if (user.role === 'patient') {
+          <a routerLink="/patient" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}"
+            class="nav-link" (click)="closeMobileMenu()">Find Doctors</a>
+          <a routerLink="/patient/appointments" routerLinkActive="active-link" class="nav-link"
+            (click)="closeMobileMenu()">My Appointments</a>
+          }
+          @if (user.role === 'doctor') {
+          <a routerLink="/doctor" routerLinkActive="active-link" class="nav-link"
+            (click)="closeMobileMenu()">Dashboard</a>
+          }
+          @if (user.role === 'admin') {
+          <a routerLink="/admin" routerLinkActive="active-link" class="nav-link"
+            (click)="closeMobileMenu()">Dashboard</a>
+          }
         </div>
 
-        <p-button label="Logout" size="small" [outlined]="true" styleClass="logout-btn" (onClick)="logout()"></p-button>
+        <div class="navbar-right">
+          <div class="user-info">
+            <span class="user-name">{{ user.name }}</span>
+            <span class="user-role">{{ user.role }}</span>
+          </div>
+
+          <p-button label="Logout" size="small" [outlined]="true" styleClass="logout-btn"
+            (onClick)="logout()"></p-button>
+        </div>
       </div>
       }
     </div>

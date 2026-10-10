@@ -12,6 +12,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class Layout implements OnInit {
   user: any = null;
+  mobileMenuOpen = false;
 
   constructor(
     private authService: AuthService,
@@ -24,6 +25,14 @@ export class Layout implements OnInit {
 
   logout() {
     this.authService.logout();
+  }
+
+  toggleMobileMenu() {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  closeMobileMenu() {
+    this.mobileMenuOpen = false;
   }
 
   get dashboardLink(): string {
